@@ -20,7 +20,7 @@ const carrito = JSON.parse(localStorage.getItem("verdiqo-carrito") || "[]");
 const metricas = JSON.parse(localStorage.getItem("verdiqo-metricas") || '{"compras":0,"co2Evitado":0}');
 let usuarioActual = JSON.parse(localStorage.getItem("verdiqo-usuario") || "null");
 let tokenSesion = localStorage.getItem("verdiqo-token") || "";
-const API_BASE = "";
+const API_BASE = "https://verdiqo-api.onrender.com";
 let apiConectada = false;
 
 function productoId(nombre) {
