@@ -37,7 +37,7 @@
   </section></main>
   <footer><p>© 2026 Verdiqo</p><p>API beta local</p></footer>
   <script>
-    const API = "";
+    const API = "https://verdiqo-api.onrender.com";
     const proveedorGuardado = JSON.parse(localStorage.getItem("verdiqo-proveedor") || "null");
     if (proveedorGuardado?.estado === "activo" && !document.querySelector(".empresa-link")) { const enlaceEmpresa = document.createElement("a"); enlaceEmpresa.className = "empresa-link"; enlaceEmpresa.href = "proveedor-panel.html"; enlaceEmpresa.textContent = "Mi empresa"; document.querySelector("header").insertBefore(enlaceEmpresa, document.querySelector("header .cuenta-link")); }
     const encabezado = document.querySelector("header");
