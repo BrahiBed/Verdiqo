@@ -47,7 +47,7 @@
   </main>
   <footer><p>© 2026 Verdiqo</p><p>Pequeñas decisiones. Un cambio enorme.</p></footer>
   <script>
-    const API = `${location.protocol}//${location.hostname}:${location.port || "3000"}`;
+    const API = "https://verdiqo-api.onrender.com";
     const encabezado = document.querySelector("header");
     const actualizarEncabezado = () => encabezado?.classList.toggle("encabezado-desplazado", window.scrollY > 12);
     window.addEventListener("scroll", actualizarEncabezado, { passive: true });

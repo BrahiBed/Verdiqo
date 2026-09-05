@@ -24,7 +24,7 @@
   </main>
   <footer><p>© 2026 Verdiqo</p><p>Panel de empresa</p></footer>
   <script>
-    const API = `${location.protocol}//${location.hostname}:${location.port || "3000"}`;
+    const API = "https://verdiqo-api.onrender.com";
     let proveedor = JSON.parse(localStorage.getItem("verdiqo-proveedor") || "null");
     const token = localStorage.getItem("verdiqo-proveedor-token") || "";
     const encabezado = document.querySelector("header");
