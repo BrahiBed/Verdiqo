@@ -2,24 +2,53 @@ const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
+let Pool;
+try { ({ Pool } = require("pg")); } catch { Pool = null; }
 
 const PORT = Number(process.env.PORT || 3000);
 const DB_FILE = path.join(__dirname, "beta-data.json");
 const initialData = { usuarios: [], proveedores: [], productos: [{ id: "botella-reciclada", nombre: "Botella reciclada", proveedorId: "aqua-circular", categoria: "reutilizable", precio: 14, stock: 5, co2: 0.8 }], pedidos: [], eventos: [], conversaciones: [], sesiones: [] };
 
-function cargarDatos() {
+// Si existe DATABASE_URL (por ejemplo, la de Neon), los datos viven en Postgres.
+// Si no, se usa el archivo JSON local, como antes. Esto permite que las pruebas
+// y el desarrollo local sigan funcionando sin necesitar una base de datos real.
+const DATABASE_URL = process.env.DATABASE_URL || "";
+const pool = DATABASE_URL && Pool ? new Pool({ connectionString: DATABASE_URL, ssl: { rejectUnauthorized: false } }) : null;
+
+function cargarDatosDesdeArchivo() {
   if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2));
   return JSON.parse(fs.readFileSync(DB_FILE, "utf8"));
 }
 
-const db = cargarDatos();
+const db = cargarDatosDesdeArchivo();
 if (!Array.isArray(db.sesiones)) db.sesiones = [];
+
+async function inicializarDatos() {
+  if (!pool) return;
+  await pool.query("CREATE TABLE IF NOT EXISTS beta_data (id INTEGER PRIMARY KEY, contenido JSONB NOT NULL)");
+  const resultado = await pool.query("SELECT contenido FROM beta_data WHERE id = 1");
+  if (resultado.rows.length === 0) {
+    await pool.query("INSERT INTO beta_data (id, contenido) VALUES (1, $1)", [db]);
+    return;
+  }
+  const datos = resultado.rows[0].contenido;
+  Object.keys(db).forEach((clave) => delete db[clave]);
+  Object.assign(db, datos);
+  if (!Array.isArray(db.sesiones)) db.sesiones = [];
+}
+
 const COMISION_VERDIQO = 0.08;
 const DURACION_SESION = 1000 * 60 * 60 * 24;
 const PAGO_REAL_CONFIGURADO = Boolean(process.env.STRIPE_SECRET_KEY);
 const id = (prefijo) => `${prefijo}_${crypto.randomUUID()}`;
 const responder = (res, status, data) => { res.writeHead(status, { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET,POST,PATCH,OPTIONS", "Access-Control-Allow-Headers": "Content-Type, Authorization" }); res.end(JSON.stringify(data)); };
-const guardar = () => fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+async function guardar() {
+  if (pool) {
+    await pool.query("INSERT INTO beta_data (id, contenido) VALUES (1, $1) ON CONFLICT (id) DO UPDATE SET contenido = $1", [db]);
+    return;
+  }
+  fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+}
 const leerBody = (req) => new Promise((resolve, reject) => {
   let body = "";
   req.on("data", (trozo) => { body += trozo; });
@@ -114,7 +143,7 @@ async function manejar(req, res) {
   const partes = url.pathname.split("/").filter(Boolean);
   try {
     if (req.method === "OPTIONS") return responder(res, 204, {});
-    if (req.method === "GET" && url.pathname === "/api/salud") return responder(res, 200, { ok: true, servicio: "agente-beta", persistencia: "json-local", modoPago: "simulado" });
+    if (req.method === "GET" && url.pathname === "/api/salud") return responder(res, 200, { ok: true, servicio: "agente-beta", persistencia: pool ? "postgres" : "json-local", modoPago: "simulado" });
     if (req.method === "GET" && url.pathname === "/api/productos") return responder(res, 200, db.productos);
     if (req.method === "POST" && url.pathname === "/api/catalogo/sincronizar") {
       const body = await leerBody(req); const productos = Array.isArray(body.productos) ? body.productos : [];
@@ -124,7 +153,7 @@ async function manejar(req, res) {
         if (producto) Object.assign(producto, datos);
         else db.productos.push(datos);
       });
-      guardar(); return responder(res, 200, { sincronizados: productos.length, productos: db.productos });
+      await guardar(); return responder(res, 200, { sincronizados: productos.length, productos: db.productos });
     }
     if (req.method === "POST" && url.pathname === "/api/usuarios") {
       const body = await leerBody(req); const nombre = String(body.nombre || "").trim(); const email = String(body.email || "").trim().toLowerCase(); const password = String(body.password || "");
@@ -133,14 +162,14 @@ async function manejar(req, res) {
       const existente = db.usuarios.find((actual) => actual.email === email);
       if (existente) return responder(res, 409, { error: "Ya existe una cuenta con ese email" });
       const usuario = { id: id("usr"), nombre, email, ...crearCredenciales(password), puntos: 0 };
-      db.usuarios.push(usuario); const token = crearSesion(usuario); guardar(); return responderSesion(res, 201, usuario, token);
+      db.usuarios.push(usuario); const token = crearSesion(usuario); await guardar(); return responderSesion(res, 201, usuario, token);
     }
     if (req.method === "POST" && url.pathname === "/api/sesiones") {
       const body = await leerBody(req); const email = String(body.email || "").trim().toLowerCase(); const password = String(body.password || "");
       const usuario = db.usuarios.find((actual) => actual.email === email);
       if (!usuario || !usuario.passwordHash || password.length === 0) return responder(res, 401, { error: "Email o contrasena incorrectos" });
       if (!validarPassword(password, usuario)) return responder(res, 401, { error: "Email o contrasena incorrectos" });
-      const token = crearSesion(usuario); guardar(); return responderSesion(res, 200, usuario, token);
+      const token = crearSesion(usuario); await guardar(); return responderSesion(res, 200, usuario, token);
     }
     if (req.method === "POST" && url.pathname === "/api/proveedores") {
       const body = await leerBody(req); const nombre = String(body.nombre || "").trim(); const email = String(body.email || "").trim().toLowerCase(); const password = String(body.password || ""); const descripcion = String(body.descripcion || "").trim(); const sitioWeb = String(body.sitioWeb || "").trim();
@@ -148,13 +177,13 @@ async function manejar(req, res) {
       if (descripcion.length < 20) return responder(res, 400, { error: "Describe tu negocio con al menos 20 caracteres" });
       if (db.proveedores.some((proveedor) => proveedor.email === email)) return responder(res, 409, { error: "Ya existe un proveedor con ese email" });
       const proveedor = { id: id("prv"), nombre, email, descripcion, sitioWeb, ...crearCredenciales(password), estado: "pendiente_revision", verificacion: { identidad: "pendiente", negocio: "pendiente", catalogo: "pendiente", enviadoEn: new Date().toISOString() } };
-      db.proveedores.push(proveedor); const token = crearSesionProveedor(proveedor); guardar(); return responder(res, 201, { ...proveedorPublico(proveedor), token });
+      db.proveedores.push(proveedor); const token = crearSesionProveedor(proveedor); await guardar(); return responder(res, 201, { ...proveedorPublico(proveedor), token });
     }
     if (req.method === "POST" && url.pathname === "/api/proveedores/sesiones") {
       const body = await leerBody(req); const email = String(body.email || "").trim().toLowerCase(); const password = String(body.password || "");
       const proveedor = db.proveedores.find((actual) => actual.email === email);
       if (!proveedor || !validarPassword(password, proveedor)) return responder(res, 401, { error: "Email o contrasena incorrectos" });
-      const token = crearSesionProveedor(proveedor); guardar(); return responder(res, 200, { ...proveedorPublico(proveedor), token });
+      const token = crearSesionProveedor(proveedor); await guardar(); return responder(res, 200, { ...proveedorPublico(proveedor), token });
     }
     if (req.method === "GET" && partes[0] === "api" && partes[1] === "proveedores" && partes[2] && partes[3] === "resumen") {
       const proveedor = autenticarProveedor(req, partes[2]);
@@ -173,7 +202,7 @@ async function manejar(req, res) {
         const body = await leerBody(req); const nombre = String(body.nombre || "").trim(); const precio = Number(body.precio); const stock = Number(body.stock); const co2 = Number(body.co2 || 0);
         if (!nombre || !Number.isFinite(precio) || precio <= 0 || !Number.isInteger(stock) || stock < 0 || !Number.isFinite(co2) || co2 < 0) return responder(res, 400, { error: "Datos de producto invalidos" });
         const producto = { id: id("prd"), nombre, proveedorId, categoria: String(body.categoria || "general"), precio, stock, co2 };
-        db.productos.push(producto); guardar(); return responder(res, 201, producto);
+        db.productos.push(producto); await guardar(); return responder(res, 201, producto);
       }
       if (req.method === "PATCH" && partes.length === 5) {
         const producto = db.productos.find((actual) => actual.id === partes[4] && actual.proveedorId === proveedorId);
@@ -182,7 +211,7 @@ async function manejar(req, res) {
         if (!Number.isFinite(precio) || precio <= 0 || !Number.isInteger(stock) || stock < 0) return responder(res, 400, { error: "Precio o stock invalidos" });
         if (body.nombre !== undefined) producto.nombre = String(body.nombre).trim();
         if (body.categoria !== undefined) producto.categoria = String(body.categoria).trim() || producto.categoria;
-        producto.precio = precio; producto.stock = stock; guardar(); return responder(res, 200, producto);
+        producto.precio = precio; producto.stock = stock; await guardar(); return responder(res, 200, producto);
       }
     }
     if (partes[0] === "api" && partes[1] === "proveedores" && partes[2] && partes[3] === "pedidos" && req.method === "GET") {
@@ -199,16 +228,16 @@ async function manejar(req, res) {
       if (!pedido) return responder(res, 404, { error: "Pedido no encontrado" });
       const body = await leerBody(req); const estados = ["confirmado", "preparando", "enviado", "entregado", "cancelado"];
       if (!estados.includes(body.estado)) return responder(res, 400, { error: "Estado de pedido invalido" });
-      pedido.estado = body.estado; guardar(); return responder(res, 200, pedido);
+      pedido.estado = body.estado; await guardar(); return responder(res, 200, pedido);
     }
     if (req.method === "POST" && url.pathname === "/api/necesidades") {
       const body = await leerBody(req); const texto = String(body.texto || "");
       const categoria = /residuo|compost|cocina/i.test(texto) ? "hogar" : /plastico|botella|desechable/i.test(texto) ? "reutilizable" : "general";
-      registrarEvento("necesidad_detectada", { texto, categoria }); guardar(); return responder(res, 200, { texto, categoria, soluciones: db.productos.filter((producto) => producto.categoria === categoria) });
+      registrarEvento("necesidad_detectada", { texto, categoria }); await guardar(); return responder(res, 200, { texto, categoria, soluciones: db.productos.filter((producto) => producto.categoria === categoria) });
     }
     if (req.method === "POST" && url.pathname === "/api/chatbot") {
       const body = await leerBody(req); const respuesta = chatbot(String(body.mensaje || ""));
-      db.conversaciones.push({ id: id("chat"), mensaje: body.mensaje, respuesta, fecha: new Date().toISOString() }); guardar(); return responder(res, 200, { respuesta });
+      db.conversaciones.push({ id: id("chat"), mensaje: body.mensaje, respuesta, fecha: new Date().toISOString() }); await guardar(); return responder(res, 200, { respuesta });
     }
     if (req.method === "GET" && url.pathname === "/api/dashboard") {
       const unidades = db.pedidos.reduce((total, pedido) => total + pedido.unidades, 0);
@@ -241,16 +270,17 @@ async function manejar(req, res) {
       }
       usuario.puntos += unidades * 10;
       const pedido = { id: id("ord"), usuarioId: usuario.id, proveedorIds: [...new Set(items.map((item) => db.productos.find((producto) => producto.id === item.productoId)?.proveedorId))], envio: { nombre: String(envio.nombre).trim(), direccion: String(envio.direccion).trim(), ciudad: String(envio.ciudad).trim(), codigoPostal: String(envio.codigoPostal).trim() }, total, unidades, co2Evitado, puntosGanados: unidades * 10, comisionVerdiqo: Number((total * COMISION_VERDIQO).toFixed(2)), estado: "confirmado", metodoPago, pago: metodoPago === "tarjeta" ? "pagado" : "simulado", fecha: new Date().toISOString() };
-      db.pedidos.push(pedido); registrarEvento("venta_atribuida", { pedidoId: pedido.id, necesidad: body.necesidad || "no especificada" }); guardar(); return responder(res, 201, pedido);
+      db.pedidos.push(pedido); registrarEvento("venta_atribuida", { pedidoId: pedido.id, necesidad: body.necesidad || "no especificada" }); await guardar(); return responder(res, 201, pedido);
     }
     if (req.method === "GET" && !url.pathname.startsWith("/api/") && servirArchivo(res, url.pathname)) return;
     responder(res, 404, { error: "Ruta no encontrada" });
   } catch (error) { responder(res, 400, { error: error.message }); }
 }
 
-function iniciar() {
+async function iniciar() {
+  await inicializarDatos();
   const servidor = http.createServer(manejar);
-  servidor.listen(PORT, () => console.log(`Agente beta API: http://localhost:${PORT}`));
+  servidor.listen(PORT, () => console.log(`Agente beta API: http://localhost:${PORT} · persistencia: ${pool ? "postgres" : "json-local"}`));
   return servidor;
 }
 
