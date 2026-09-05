@@ -1,0 +1,7 @@
+/server
+   app.js
+   /db
+      neon.js
+   /routes
+      auth.js
+      productos.js
