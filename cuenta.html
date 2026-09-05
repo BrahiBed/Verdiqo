@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuenta | Verdiqo</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header class="encabezado">
+    <button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false">☰ <span>Menú</span></button>
+    <a class="marca" href="index.html"><img src="verdiqo-logo.png" alt="Verdiqo"></a>
+    <span class="api-status" id="api-status">Modo local</span>
+    <a class="cuenta-link" href="cuenta.html">Cuenta / Iniciar sesión</a>
+    <a class="carrito-link" href="carrito.html">Carrito <span id="contador-carrito">0</span></a>
+  </header>
+  <aside id="menu-lateral" class="menu-lateral" aria-hidden="true"><button class="menu-cerrar" aria-label="Cerrar menú">×</button><p class="etiqueta etiqueta-clara">Explora Verdiqo</p><nav class="menu-navegacion"><a href="index.html">Inicio</a><a href="productos.html">Productos</a><a href="impacto.html">Impacto ambiental</a><a href="fidelizacion.html">Beneficios</a><a href="api.html">Centro API</a></nav></aside><div class="menu-fondo"></div>
+  <main>
+    <section class="seccion cuenta-seccion">
+      <div class="seccion-cabecera"><div><p class="etiqueta etiqueta-verde">Tu espacio Verdiqo</p><h1>Cuenta</h1></div><p class="texto-secundario">Conserva tu progreso, gestiona tus compras o presenta tu solución como proveedor.</p></div>
+      <div id="cuenta-mensaje" class="cuenta-mensaje">Elige cómo quieres entrar.</div>
+      <div class="cuenta-grid">
+        <section class="cuenta-panel">
+          <p class="etiqueta etiqueta-verde">Compradores</p>
+          <h2>Ya tengo una cuenta</h2>
+          <p>Accede a tus puntos, pedidos y datos de envío. Tu carrito guardado seguirá esperándote.</p>
+          <form id="comprador-login" class="cuenta-form"><label>Email<input name="email" type="email" autocomplete="email" required></label><label>Contraseña<input name="password" type="password" autocomplete="current-password" required></label><button class="boton boton-verde">Iniciar sesión</button></form>
+          <details><summary>Crear una cuenta nueva</summary><form id="comprador-registro" class="cuenta-form"><label>Nombre<input name="nombre" autocomplete="name" required minlength="2"></label><label>Email<input name="email" type="email" autocomplete="email" required></label><label>Contraseña<input name="password" type="password" autocomplete="new-password" minlength="8" required></label><button class="boton boton-claro">Registrarme</button></form></details>
+          <button id="comprador-salir" class="boton-eliminar" type="button" hidden>Cerrar sesión de comprador</button>
+        </section>
+        <section class="cuenta-panel cuenta-proveedor-panel">
+          <p class="etiqueta etiqueta-verde">Proveedores</p>
+          <h2>¡Soy proveedor!</h2>
+          <p>Presenta tu negocio. Revisaremos tu identidad, actividad y catálogo antes de aceptar el acceso.</p>
+          <form id="proveedor-login-cuenta" class="cuenta-form"><label>Email profesional<input name="email" type="email" required></label><label>Contraseña<input name="password" type="password" required></label><button class="boton boton-verde">Entrar como proveedor</button></form>
+          <details><summary>Solicitar acceso como proveedor</summary><form id="proveedor-registro-cuenta" class="cuenta-form"><label>Nombre del negocio<input name="nombre" required></label><label>Email profesional<input name="email" type="email" required></label><label>Contraseña<input name="password" type="password" minlength="8" required></label><label>Describe tu negocio<textarea name="descripcion" minlength="20" required></textarea></label><label>Sitio web <span>(opcional)</span><input name="sitioWeb" type="url"></label><button class="boton boton-claro">Enviar solicitud</button></form></details>
+          <button id="proveedor-salir-cuenta" class="boton-eliminar" type="button" hidden>Cerrar sesión de proveedor</button>
+        </section>
+      </div>
+      <section id="proveedor-dashboard" class="proveedor-dashboard" hidden>
+        <div class="proveedor-dashboard-cabecera"><div><p class="etiqueta etiqueta-verde">Espacio de empresa</p><h2 id="dashboard-proveedor-nombre"></h2><span id="dashboard-proveedor-estado"></span></div><a class="boton boton-verde" href="api.html">Gestionar catálogo</a></div>
+        <div class="dashboard-metricas"><article><strong id="dashboard-productos">0</strong><span>productos activos</span></article><article><strong id="dashboard-stock">0</strong><span>unidades disponibles</span></article><article><strong id="dashboard-pedidos">0</strong><span>pedidos recibidos</span></article><article><strong id="dashboard-ingresos">$0</strong><span>ingresos registrados</span></article></div>
+        <div class="dashboard-pie"><span id="dashboard-pendientes">0 pedidos pendientes</span><span id="dashboard-co2">0 kg CO2 asociado</span></div>
+      </section>
+      <div class="cuenta-carrito-nota"><strong>Tu carrito está a salvo.</strong><span>La selección se guarda en este navegador aunque cambies de cuenta o visites otra sección.</span><a href="carrito.html">Ver mi carrito →</a></div>
+    </section>
+  </main>
+  <footer><p>© 2026 Verdiqo</p><p>Pequeñas decisiones. Un cambio enorme.</p></footer>
+  <script>
+    const API = `${location.protocol}//${location.hostname}:${location.port || "3000"}`;
+    const encabezado = document.querySelector("header");
+    const actualizarEncabezado = () => encabezado?.classList.toggle("encabezado-desplazado", window.scrollY > 12);
+    window.addEventListener("scroll", actualizarEncabezado, { passive: true });
+    actualizarEncabezado();
+    let comprador = JSON.parse(localStorage.getItem("verdiqo-usuario") || "null");
+    let compradorToken = localStorage.getItem("verdiqo-token") || "";
+    let proveedor = JSON.parse(localStorage.getItem("verdiqo-proveedor") || "null");
+    let proveedorToken = localStorage.getItem("verdiqo-proveedor-token") || "";
+    const mensaje = (texto, error = false) => { const panel = document.getElementById("cuenta-mensaje"); panel.textContent = texto; panel.className = `cuenta-mensaje ${error ? "cuenta-error" : ""}`; };
+    const guardar = (tipo, datos) => { if (tipo === "comprador") { comprador = datos; compradorToken = datos.token; localStorage.setItem("verdiqo-usuario", JSON.stringify(comprador)); localStorage.setItem("verdiqo-token", compradorToken); } else { proveedor = datos; proveedorToken = datos.token; localStorage.setItem("verdiqo-proveedor", JSON.stringify(proveedor)); localStorage.setItem("verdiqo-proveedor-token", proveedorToken); } render(); };
+    function render() { document.getElementById("comprador-salir").hidden = !comprador; document.getElementById("proveedor-salir-cuenta").hidden = !proveedor; document.getElementById("comprador-login").hidden = Boolean(comprador); document.querySelector(".cuenta-panel details").hidden = Boolean(comprador); document.getElementById("proveedor-login-cuenta").hidden = Boolean(proveedor); document.querySelector(".cuenta-proveedor-panel details").hidden = Boolean(proveedor); const dashboard = document.getElementById("proveedor-dashboard"); if (proveedor?.estado === "activo" && !document.querySelector(".empresa-link")) { const enlace = document.createElement("a"); enlace.className = "empresa-link"; enlace.href = "proveedor-panel.html"; enlace.textContent = "Mi empresa"; document.querySelector("header").insertBefore(enlace, document.querySelector("header .cuenta-link")); } if (comprador) mensaje(`Comprador conectado: ${comprador.nombre}.`); if (proveedor && proveedor.estado === "pendiente_revision") mensaje("Proveedor conectado: tu solicitud está pendiente de aprobación."); if (proveedor && proveedor.estado === "activo") { mensaje(`Proveedor conectado: ${proveedor.nombre}.`); cargarDashboardProveedor(); } if (dashboard) dashboard.hidden = !proveedor || proveedor.estado !== "activo"; document.getElementById("contador-carrito").textContent = JSON.parse(localStorage.getItem("verdiqo-carrito") || "[]").reduce((total, item) => total + item.cantidad, 0); }
+    async function cargarDashboardProveedor() { try { const respuesta = await fetch(`${API}/api/proveedores/${proveedor.id}/resumen`, { headers: { Authorization: `Bearer ${proveedorToken}` } }); if (!respuesta.ok) return; const datos = await respuesta.json(); document.getElementById("dashboard-proveedor-nombre").textContent = datos.proveedor.nombre; document.getElementById("dashboard-proveedor-estado").textContent = "Cuenta verificada"; document.getElementById("dashboard-productos").textContent = datos.productos; document.getElementById("dashboard-stock").textContent = datos.unidadesDisponibles; document.getElementById("dashboard-pedidos").textContent = datos.pedidos; document.getElementById("dashboard-ingresos").textContent = `$${datos.ingresos.toFixed(2)}`; document.getElementById("dashboard-pendientes").textContent = `${datos.pedidosPendientes} pedidos pendientes`; document.getElementById("dashboard-co2").textContent = `${datos.co2Aportado} kg CO2 asociado`; } catch { mensaje("No se pudo cargar el resumen de empresa.", true); } }
+    async function enviar(evento, ruta, tipo) { evento.preventDefault(); const datos = Object.fromEntries(new FormData(evento.target).entries()); try { const respuesta = await fetch(`${API}${ruta}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(datos) }); const resultado = await respuesta.json(); if (!respuesta.ok) throw new Error(resultado.error || "No se pudo completar la solicitud"); guardar(tipo, resultado); if (tipo === "proveedor" && resultado.estado === "pendiente_revision") document.getElementById("proveedor-registro-cuenta").insertAdjacentHTML("afterend", "<p class=\"cuenta-pendiente\">Solicitud enviada. Queda pendiente de aprobación.</p>"); if (tipo === "proveedor" && resultado.estado === "activo") location.href = "proveedor-panel.html"; } catch (error) { mensaje(error.message, true); } }
+    function salir(tipo) { if (tipo === "comprador") { comprador = null; compradorToken = ""; localStorage.removeItem("verdiqo-usuario"); localStorage.removeItem("verdiqo-token"); } else { proveedor = null; proveedorToken = ""; localStorage.removeItem("verdiqo-proveedor"); localStorage.removeItem("verdiqo-proveedor-token"); } mensaje("Sesión cerrada. El carrito se conserva."); render(); }
+    document.getElementById("comprador-login").addEventListener("submit", (evento) => enviar(evento, "/api/sesiones", "comprador"));
+    document.getElementById("comprador-registro").addEventListener("submit", (evento) => enviar(evento, "/api/usuarios", "comprador"));
+    document.getElementById("proveedor-login-cuenta").addEventListener("submit", (evento) => enviar(evento, "/api/proveedores/sesiones", "proveedor"));
+    document.getElementById("proveedor-registro-cuenta").addEventListener("submit", (evento) => enviar(evento, "/api/proveedores", "proveedor"));
+    document.getElementById("comprador-salir").addEventListener("click", () => salir("comprador"));
+    document.getElementById("proveedor-salir-cuenta").addEventListener("click", () => salir("proveedor"));
+    document.querySelector(".menu-toggle").addEventListener("click", () => { document.getElementById("menu-lateral").classList.add("abierto"); document.querySelector(".menu-fondo").classList.add("visible"); });
+    document.querySelector(".menu-cerrar").addEventListener("click", () => { document.getElementById("menu-lateral").classList.remove("abierto"); document.querySelector(".menu-fondo").classList.remove("visible"); });
+    document.querySelector(".menu-fondo").addEventListener("click", () => { document.getElementById("menu-lateral").classList.remove("abierto"); document.querySelector(".menu-fondo").classList.remove("visible"); });
+    render();
+  </script>
+</body>
+</html>

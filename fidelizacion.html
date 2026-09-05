@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beneficios | Verdiqo</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header class="encabezado">
+    <button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false">☰ <span>Menú</span></button>
+    <a class="marca" href="index.html"><img src="verdiqo-logo.png" alt="Verdiqo"></a>
+    <span class="api-status" id="api-status">Modo local</span>
+    <nav><ul><li><a href="index.html">Inicio</a></li><li><a href="productos.html">Productos</a></li><li><a href="fidelizacion.html">Beneficios</a></li><li><a href="impacto.html">Impacto ambiental</a></li></ul></nav>
+    <a class="cuenta-link" href="cuenta.html">Cuenta / Iniciar sesión</a>
+    <a class="carrito-link" href="carrito.html" aria-label="Ver carrito">Carrito <span id="contador-carrito">0</span></a>
+  </header>
+  <aside id="menu-lateral" class="menu-lateral" aria-hidden="true"><button class="menu-cerrar" aria-label="Cerrar menú">×</button><p class="etiqueta etiqueta-clara">Explora Verdiqo</p><nav class="menu-navegacion"><a href="index.html">Inicio</a><a href="productos.html">Productos</a><a href="impacto.html">Impacto ambiental</a><a href="fidelizacion.html">Beneficios</a><a href="api.html">Centro API</a></nav></aside><div class="menu-fondo"></div>
+  <main><section class="seccion fidelizacion-seccion">
+    <div class="seccion-cabecera"><div><p class="etiqueta etiqueta-verde">Premiamos tus decisiones</p><h1>Club Verdiqo</h1></div><p class="texto-secundario">Convierte tus compras conscientes en beneficios para seguir cuidando el planeta.</p></div>
+    <div class="fidelizacion-panel"><div class="nivel-cliente"><span class="insignia" aria-hidden="true">✦</span><div><p class="etiqueta etiqueta-verde">Tu nivel actual</p><h2 id="nivel-cliente">Semilla</h2><p id="mensaje-nivel">Haz tu primera compra para comenzar.</p></div></div><div class="progreso-fidelizacion"><div class="progreso-cabecera"><span id="puntos-cliente">0 puntos</span><strong id="proximo-nivel">100 para Brote</strong></div><div class="barra barra-fidelizacion"><i id="barra-fidelizacion"></i></div><p id="recompensa-cliente">Recompensa: 10% de descuento al alcanzar el nivel Brote.</p></div></div>
+  </section></main>
+  <footer><p>© 2026 Verdiqo</p><p>Pequeñas decisiones. Un cambio enorme.</p></footer>
+  <script src="script.js"></script>
+</body>
+</html>

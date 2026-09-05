@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de empresa | Verdiqo</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header class="encabezado proveedor-panel-encabezado">
+    <button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false">☰ <span>Menú</span></button>
+    <a class="marca" href="index.html"><img src="verdiqo-logo.png" alt="Verdiqo"></a>
+    <span class="panel-etiqueta">Panel de empresa</span>
+    <a class="cuenta-link" href="cuenta.html">Mi cuenta</a>
+  </header>
+  <aside id="menu-lateral" class="menu-lateral" aria-hidden="true"><button class="menu-cerrar" aria-label="Cerrar menú">×</button><p class="etiqueta etiqueta-clara">Empresa</p><nav class="menu-navegacion"><a href="proveedor-panel.html">Resumen</a><a href="api.html">Catálogo y pedidos</a><a href="cuenta.html">Mi cuenta</a><a href="index.html">Volver a Verdiqo</a></nav></aside><div class="menu-fondo"></div>
+  <main>
+    <section class="seccion empresa-seccion">
+      <div class="empresa-cabecera"><div><p class="etiqueta etiqueta-verde">Espacio privado</p><h1 id="empresa-nombre">Cargando empresa...</h1><p id="empresa-estado" class="empresa-estado">Verificando sesión</p></div><button id="cerrar-sesion-empresa" class="boton-eliminar" type="button">Cerrar sesión</button></div>
+      <div id="empresa-error" class="cuenta-mensaje cuenta-error" hidden></div>
+      <div class="empresa-metricas"><article><strong id="empresa-productos">0</strong><span>productos activos</span></article><article><strong id="empresa-stock">0</strong><span>unidades disponibles</span></article><article><strong id="empresa-pedidos">0</strong><span>pedidos recibidos</span></article><article><strong id="empresa-ingresos">$0.00</strong><span>ingresos registrados</span></article></div>
+      <div class="empresa-columnas"><section class="empresa-bloque"><p class="etiqueta etiqueta-verde">Actividad</p><h2>Tu operación</h2><div class="empresa-resumen"><span id="empresa-pendientes">0 pedidos pendientes</span><span id="empresa-co2">0 kg CO2 asociado</span></div><a class="boton boton-verde" href="api.html">Gestionar catálogo y pedidos</a></section><section class="empresa-bloque empresa-verificacion"><p class="etiqueta etiqueta-verde">Verificación</p><h2>Cuenta autorizada</h2><p>Tu empresa puede publicar soluciones, actualizar existencias y atender pedidos desde el centro de operaciones.</p><span class="estado-aprobado">Identidad · Negocio · Catálogo aprobados</span></section></div>
+    </section>
+  </main>
+  <footer><p>© 2026 Verdiqo</p><p>Panel de empresa</p></footer>
+  <script>
+    const API = `${location.protocol}//${location.hostname}:${location.port || "3000"}`;
+    let proveedor = JSON.parse(localStorage.getItem("verdiqo-proveedor") || "null");
+    const token = localStorage.getItem("verdiqo-proveedor-token") || "";
+    const encabezado = document.querySelector("header");
+    window.addEventListener("scroll", () => encabezado.classList.toggle("encabezado-desplazado", window.scrollY > 12), { passive: true });
+    function mostrarError(texto) { const panel = document.getElementById("empresa-error"); panel.textContent = texto; panel.hidden = false; }
+    async function cargar() {
+      if (!proveedor || !token || proveedor.estado !== "activo") { location.href = "cuenta.html"; return; }
+      try {
+        const respuesta = await fetch(`${API}/api/proveedores/${proveedor.id}/resumen`, { headers: { Authorization: `Bearer ${token}` } });
+        const datos = await respuesta.json();
+        if (!respuesta.ok) throw new Error(datos.error || "No se pudo cargar el panel");
+        document.getElementById("empresa-nombre").textContent = datos.proveedor.nombre;
+        document.getElementById("empresa-estado").textContent = "Cuenta verificada y autorizada";
+        document.getElementById("empresa-productos").textContent = datos.productos;
+        document.getElementById("empresa-stock").textContent = datos.unidadesDisponibles;
+        document.getElementById("empresa-pedidos").textContent = datos.pedidos;
+        document.getElementById("empresa-ingresos").textContent = `$${datos.ingresos.toFixed(2)}`;
+        document.getElementById("empresa-pendientes").textContent = `${datos.pedidosPendientes} pedidos pendientes`;
+        document.getElementById("empresa-co2").textContent = `${datos.co2Aportado} kg CO2 asociado`;
+      } catch (error) { mostrarError(error.message); }
+    }
+    function cerrarSesion() { localStorage.removeItem("verdiqo-proveedor"); localStorage.removeItem("verdiqo-proveedor-token"); location.href = "cuenta.html"; }
+    document.getElementById("cerrar-sesion-empresa").addEventListener("click", cerrarSesion);
+    document.querySelector(".menu-toggle").addEventListener("click", () => { document.getElementById("menu-lateral").classList.add("abierto"); document.querySelector(".menu-fondo").classList.add("visible"); });
+    document.querySelector(".menu-cerrar").addEventListener("click", () => { document.getElementById("menu-lateral").classList.remove("abierto"); document.querySelector(".menu-fondo").classList.remove("visible"); });
+    document.querySelector(".menu-fondo").addEventListener("click", () => { document.getElementById("menu-lateral").classList.remove("abierto"); document.querySelector(".menu-fondo").classList.remove("visible"); });
+    cargar();
+  </script>
+</body>
+</html>

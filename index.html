@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verdiqo | La necesidad detrás de cada elección</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header class="encabezado encabezado-inicial">
+    <button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false">☰ <span>Menú</span></button>
+    <a class="marca" href="#inicio"><img src="verdiqo-logo.png" alt="Verdiqo"></a>
+    <span class="api-status" id="api-status">Modo local</span>
+    <nav>
+      <ul>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="productos.html">Productos</a></li>
+        <li><a href="fidelizacion.html">Beneficios</a></li>
+        <li><a href="impacto.html">Impacto ambiental</a></li>
+      </ul>
+    </nav>
+    <a class="cuenta-link" href="cuenta.html">Cuenta / Iniciar sesión</a>
+    <a class="carrito-link" href="carrito.html" aria-label="Ver carrito">Carrito <span id="contador-carrito">0</span></a>
+  </header>
+  <aside id="menu-lateral" class="menu-lateral" aria-hidden="true">
+    <button class="menu-cerrar" aria-label="Cerrar menú">×</button>
+    <p class="etiqueta etiqueta-clara">Explora Verdiqo</p>
+    <nav class="menu-navegacion"><a href="index.html">Inicio</a><a href="productos.html">Productos</a><a href="impacto.html">Impacto ambiental</a><a href="fidelizacion.html">Beneficios</a><a href="api.html">Centro API</a></nav>
+  </aside>
+  <div class="menu-fondo"></div>
+
+  <section id="inicio" class="hero">
+    <div class="hero-contenido">
+      <p class="etiqueta">La conexión que faltaba</p>
+      <h1>Hay una necesidad<br>que todavía <em>no ves.</em></h1>
+      <p>Verdiqo la identifica, la convierte en una decisión concreta y conecta a cada persona con una solución responsable.</p>
+      <div class="hero-acciones"><a class="boton boton-claro" href="productos.html">Descubrir soluciones <span aria-hidden="true">→</span></a><a class="hero-enlace" href="impacto.html">Ver cómo funciona</a></div>
+    </div>
+    <div class="hero-dato" aria-label="Datos de impacto de la comunidad">
+      <span class="estado-sistema"><i></i> Sistema activo</span>
+      <strong>Necesidad</strong><span>detectada</span>
+      <strong>Solución</strong><span>conectada</span>
+      <strong>Impacto</strong><span>medido</span>
+    </div>
+  </section>
+
+  <main>
+    <section class="seccion presentacion-seccion">
+      <div class="seccion-cabecera"><div><p class="etiqueta etiqueta-verde">Una categoría nueva</p><h2>No vendemos productos. Revelamos posibilidades.</h2></div><p class="texto-secundario">Verdiqo conecta una necesidad cotidiana con el proveedor capaz de resolverla, y hace visible el valor de esa conexión.</p></div>
+      <div class="presentacion-grid">
+        <article><span class="paso">01</span><h3>Una pregunta abre el camino</h3><p>¿Quieres reducir residuos, ahorrar recursos o cuidar lo que consumes? Verdiqo traduce esa intención.</p></article>
+        <article><span class="paso">02</span><h3>La solución encuentra contexto</h3><p>El proveedor no aparece como un anuncio aislado: aparece porque resuelve una necesidad real.</p></article>
+        <article><span class="paso">03</span><h3>El resultado se vuelve visible</h3><p>Compra, impacto, fidelidad y datos se conectan para que la decisión pueda repetirse y crecer.</p></article>
+      </div>
+      <div class="audiencias"><a class="audiencia" href="productos.html"><span>Para personas</span><strong>Encuentra lo que necesitabas antes de saber cómo buscarlo →</strong></a><a class="audiencia" href="impacto.html"><span>Para empresas</span><strong>Convierte tu solución en una respuesta visible y medible →</strong></a></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Verdiqo</p>
+    <p>Pequeñas decisiones. Un cambio enorme.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Productos | Verdiqo</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header class="encabezado">
+    <button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false">☰ <span>Menú</span></button>
+    <a class="marca" href="index.html"><img src="verdiqo-logo.png" alt="Verdiqo"></a>
+    <span class="api-status" id="api-status">Modo local</span>
+    <nav><ul><li><a href="index.html">Inicio</a></li><li><a href="productos.html">Productos</a></li><li><a href="fidelizacion.html">Beneficios</a></li><li><a href="impacto.html">Impacto ambiental</a></li></ul></nav>
+    <a class="cuenta-link" href="cuenta.html">Cuenta / Iniciar sesión</a>
+    <a class="carrito-link" href="carrito.html" aria-label="Ver carrito">Carrito <span id="contador-carrito">0</span></a>
+  </header>
+  <aside id="menu-lateral" class="menu-lateral" aria-hidden="true"><button class="menu-cerrar" aria-label="Cerrar menú">×</button><p class="etiqueta etiqueta-clara">Explora Verdiqo</p><nav class="menu-navegacion"><a href="index.html">Inicio</a><a href="productos.html">Productos</a><a href="impacto.html">Impacto ambiental</a><a href="fidelizacion.html">Beneficios</a><a href="api.html">Centro API</a></nav></aside><div class="menu-fondo"></div>
+  <main><section class="seccion productos-seccion">
+    <div class="seccion-cabecera"><div><p class="etiqueta etiqueta-verde">Compra con propósito</p><h1>Favoritos sostenibles</h1></div><p class="texto-secundario">Alternativas simples para transformar tus hábitos diarios.</p></div>
+    <div class="catalogo-controles">
+      <label class="busqueda"><span aria-hidden="true">⌕</span><input id="buscar-producto" type="search" placeholder="Buscar un producto" aria-label="Buscar un producto"></label>
+      <div class="filtros" role="group" aria-label="Filtrar productos">
+        <button class="filtro activo" data-filtro="todos">Todos</button>
+        <button class="filtro" data-filtro="reutilizable">Reutilizables</button>
+        <button class="filtro" data-filtro="textil">Textil</button>
+        <button class="filtro" data-filtro="hogar">Hogar</button>
+        <button class="filtro" data-filtro="cuidado">Cuidado personal</button>
+      </div>
+    </div>
+    <div id="catalogo" class="catalogo" aria-live="polite"></div>
+  </section></main>
+  <footer><p>© 2026 Verdiqo</p><p>Pequeñas decisiones. Un cambio enorme.</p></footer>
+  <script src="script.js"></script>
+</body>
+</html>

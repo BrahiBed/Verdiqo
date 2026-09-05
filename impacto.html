@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Impacto ambiental | Verdiqo</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header class="encabezado">
+    <button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false">☰ <span>Menú</span></button>
+    <a class="marca" href="index.html"><img src="verdiqo-logo.png" alt="Verdiqo"></a>
+    <span class="api-status" id="api-status">Modo local</span>
+    <nav><ul><li><a href="index.html">Inicio</a></li><li><a href="productos.html">Productos</a></li><li><a href="fidelizacion.html">Beneficios</a></li><li><a href="impacto.html">Impacto ambiental</a></li></ul></nav>
+    <a class="cuenta-link" href="cuenta.html">Cuenta / Iniciar sesión</a>
+    <a class="carrito-link" href="carrito.html" aria-label="Ver carrito">Carrito <span id="contador-carrito">0</span></a>
+  </header>
+  <aside id="menu-lateral" class="menu-lateral" aria-hidden="true"><button class="menu-cerrar" aria-label="Cerrar menú">×</button><p class="etiqueta etiqueta-clara">Explora Verdiqo</p><nav class="menu-navegacion"><a href="index.html">Inicio</a><a href="productos.html">Productos</a><a href="impacto.html">Impacto ambiental</a><a href="fidelizacion.html">Beneficios</a><a href="api.html">Centro API</a></nav></aside><div class="menu-fondo"></div>
+  <main><section class="seccion impacto-seccion">
+    <div class="seccion-cabecera"><div><p class="etiqueta etiqueta-clara">Más que una compra</p><h1>Tu impacto ambiental</h1></div><p class="texto-secundario texto-claro">Cada elección suma. Aquí puedes ver el resultado de tus compras.</p></div>
+    <div class="metricas-globales" aria-live="polite"><article><strong id="metrica-compras">0</strong><span>compras confirmadas</span></article><article><strong id="metrica-unidades">0</strong><span>unidades elegidas</span></article><article><strong id="metrica-proveedores">0</strong><span>proveedores activos</span></article></div>
+    <div class="impacto-grid"><div class="impacto-total"><span id="co2-total">0.00 kg</span><p>de CO2 evitados por tus compras</p></div><div class="impacto-barras"><div class="barra-fila"><span>Material reutilizado</span><strong id="material-total">0 kg</strong><div class="barra"><i id="barra-material"></i></div></div><div class="barra-fila"><span>Productos elegidos</span><strong id="productos-total">0</strong><div class="barra"><i id="barra-productos"></i></div></div></div></div>
+  </section></main>
+  <footer><p>© 2026 Verdiqo</p><p>Pequeñas decisiones. Un cambio enorme.</p></footer>
+  <script src="script.js"></script>
+</body>
+</html>

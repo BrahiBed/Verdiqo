@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrito | Verdiqo</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header class="encabezado">
+    <button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false">☰ <span>Menú</span></button>
+    <a class="marca" href="index.html"><img src="verdiqo-logo.png" alt="Verdiqo"></a>
+    <span class="api-status" id="api-status">Modo local</span>
+    <nav><ul><li><a href="index.html">Inicio</a></li><li><a href="productos.html">Productos</a></li><li><a href="fidelizacion.html">Beneficios</a></li><li><a href="impacto.html">Impacto ambiental</a></li></ul></nav>
+    <a class="cuenta-link" href="cuenta.html">Cuenta / Iniciar sesión</a>
+    <a class="carrito-link" href="carrito.html" aria-label="Ver carrito">Carrito <span id="contador-carrito">0</span></a>
+  </header>
+  <aside id="menu-lateral" class="menu-lateral" aria-hidden="true"><button class="menu-cerrar" aria-label="Cerrar menú">×</button><p class="etiqueta etiqueta-clara">Explora Verdiqo</p><nav class="menu-navegacion"><a href="index.html">Inicio</a><a href="productos.html">Productos</a><a href="impacto.html">Impacto ambiental</a><a href="fidelizacion.html">Beneficios</a><a href="api.html">Centro API</a></nav></aside><div class="menu-fondo"></div>
+  <main><section class="seccion carrito-seccion">
+    <div class="seccion-cabecera"><div><p class="etiqueta etiqueta-verde">Tu selección</p><h1>Carrito de compra</h1></div><p id="carrito-total" class="total-carrito">0 productos</p></div>
+    <div id="carrito-contenido" class="carrito-contenido"></div>
+    <div id="resumen-carrito" class="resumen-carrito"></div>
+    <div id="recomendaciones" class="recomendaciones"></div>
+    <div id="checkout-usuario" class="checkout-usuario">
+      <p class="etiqueta etiqueta-verde">Antes de confirmar</p>
+      <h2>Guarda tu progreso</h2>
+      <p id="usuario-mensaje">Registra tu nombre y email para asociar la compra a tu cuenta y acumular puntos.</p>
+      <form id="usuario-form" class="usuario-form">
+        <label>Nombre<input id="usuario-nombre" name="nombre" autocomplete="name" required minlength="2"></label>
+        <label>Email<input id="usuario-email" name="email" type="email" autocomplete="email" required></label>
+        <label>Contraseña<input id="usuario-password" name="password" type="password" autocomplete="new-password" required minlength="8"></label>
+        <button class="boton boton-verde" type="submit">Registrar cuenta</button>
+      </form>
+      <form id="login-form" class="login-form">
+        <label>Email de tu cuenta<input id="login-email" name="email" type="email" autocomplete="email" required></label>
+        <label>Contraseña<input id="login-password" name="password" type="password" autocomplete="current-password" required></label>
+        <button class="boton boton-claro" type="submit">Iniciar sesión</button>
+      </form>
+      <button id="cerrar-sesion" class="boton-eliminar" type="button" hidden>Cerrar sesión</button>
+      <form id="envio-form" class="envio-form">
+        <p class="etiqueta etiqueta-verde">Entrega</p>
+        <h3>¿Dónde lo enviamos?</h3>
+        <div class="envio-grid">
+          <label>Nombre de recepción<input id="envio-nombre" name="nombre" autocomplete="shipping name" required></label>
+          <label>Dirección<input id="envio-direccion" name="direccion" autocomplete="shipping street-address" required></label>
+          <label>Ciudad<input id="envio-ciudad" name="ciudad" autocomplete="shipping address-level2" required></label>
+          <label>Código postal<input id="envio-codigo" name="codigoPostal" autocomplete="shipping postal-code" required></label>
+        </div>
+      </form>
+      <div class="pago-form">
+        <p class="etiqueta etiqueta-verde">Pago</p>
+        <label for="metodo-pago">Método de pago</label>
+        <select id="metodo-pago">
+          <option value="simulado">Pago de prueba</option>
+          <option value="tarjeta">Tarjeta (Stripe)</option>
+        </select>
+        <small id="pago-ayuda">Modo beta: no se realiza ningún cargo.</small>
+      </div>
+    </div>
+    <button id="confirmar-compra" class="boton boton-comprar" hidden>Confirmar compra</button>
+    <div id="pedido-confirmado" class="pedido-confirmado" hidden aria-live="polite"></div>
+    <section id="historial-pedidos" class="historial-pedidos" hidden>
+      <p class="etiqueta etiqueta-verde">Tu actividad</p>
+      <h2>Pedidos anteriores</h2>
+      <div id="lista-pedidos"></div>
+    </section>
+  </section></main>
+  <footer><p>© 2026 Verdiqo</p><p>Pequeñas decisiones. Un cambio enorme.</p></footer>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "verdiqo-beta",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agente tecnico y API local para la beta de Verdiqo",
+  "scripts": {
+    "start": "node agente-beta.js",
+    "test": "node --test agente-beta.test.js"
+  }
+}
